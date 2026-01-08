@@ -20,13 +20,9 @@ from .utils import create_slug
 from .http_utils import post_json_with_retry
 
 # Configuration
-# Firecrawl: Defaults to localhost (self-hosted via docker compose up)
-# For cloud API, set FIRECRAWL_URL=https://api.firecrawl.dev and FIRECRAWL_API_KEY
+# Firecrawl Cloud: Get free API key at https://firecrawl.dev (500 credits/month free)
 FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY", "")
-FIRECRAWL_URL = os.getenv(
-    "FIRECRAWL_URL",
-    "https://api.firecrawl.dev" if FIRECRAWL_API_KEY else "http://localhost:3002"
-)
+FIRECRAWL_URL = os.getenv("FIRECRAWL_URL", "https://api.firecrawl.dev")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"

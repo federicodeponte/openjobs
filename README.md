@@ -7,30 +7,28 @@
 
 No more writing custom scrapers for each company - OpenJobs works universally on any careers page.
 
-## Quick Start (3 Steps)
+## Quick Start
 
-### 1. Clone & Install
+### 1. Install
 
 ```bash
+pip install requests tenacity
 git clone https://github.com/yourusername/openjobs.git
 cd openjobs
-pip install -e .
 ```
 
-### 2. Start Firecrawl (Local)
+### 2. Get API Keys (Both Free)
 
-```bash
-./start.sh
-```
-
-This starts Firecrawl locally using Docker. That's it - no API keys needed for Firecrawl!
-
-> **Don't have Docker?** Install it from [docker.com](https://docs.docker.com/get-docker/)
+| Service | Free Tier | Get Key |
+|---------|-----------|---------|
+| **Google Gemini** | Generous free tier | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| **Firecrawl** | 500 credits/month | [firecrawl.dev](https://firecrawl.dev) |
 
 ### 3. Scrape Jobs
 
 ```bash
-export GOOGLE_API_KEY=your_key  # Get free at https://aistudio.google.com/apikey
+export GOOGLE_API_KEY=your_google_key
+export FIRECRAWL_API_KEY=your_firecrawl_key
 
 python -c "
 from openjobs import scrape_careers_page
@@ -63,35 +61,7 @@ Traditional job scrapers break when websites change. They require constant maint
 - **AI-Powered Extraction** - Gemini AI extracts jobs intelligently
 - **Job Classification** - Automatically categorize jobs (Engineering, Product, Design, etc.)
 - **Job Enrichment** - Extract salary, tech stack, requirements, remote status
-- **Self-Hosted** - Run Firecrawl locally with Docker (free, unlimited)
 - **Production Ready** - Rate limiting, retry logic, SSRF protection
-
-## Installation Options
-
-### Option A: Self-Hosted Firecrawl (Recommended - Free & Unlimited)
-
-```bash
-# Clone repo
-git clone https://github.com/yourusername/openjobs.git
-cd openjobs
-pip install -e .
-
-# Start Firecrawl locally
-./start.sh
-
-# Set only Google API key (Firecrawl runs locally)
-export GOOGLE_API_KEY=your_key
-```
-
-### Option B: Firecrawl Cloud (No Docker Required)
-
-```bash
-pip install openjobs
-
-# Set both API keys
-export GOOGLE_API_KEY=your_google_key
-export FIRECRAWL_API_KEY=your_firecrawl_key  # Get at https://firecrawl.dev
-```
 
 ## Usage Examples
 
@@ -170,37 +140,25 @@ python -m openjobs.scraper https://linear.app/careers Linear
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GOOGLE_API_KEY` | Google API key for Gemini | **Required** |
-| `FIRECRAWL_API_KEY` | Firecrawl cloud API key | Optional |
-| `FIRECRAWL_URL` | Firecrawl URL | `localhost:3002` (self-hosted) |
-| `GEMINI_MODEL` | Gemini model | `gemini-2.0-flash` |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `GOOGLE_API_KEY` | Google API key for Gemini | **Yes** |
+| `FIRECRAWL_API_KEY` | Firecrawl API key | **Yes** |
+| `FIRECRAWL_URL` | Custom Firecrawl URL | No |
+| `GEMINI_MODEL` | Gemini model | No (default: gemini-2.0-flash) |
 
-### Getting API Keys
+### Example `.env` File
 
-**Google API Key (Required):**
-1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
-2. Click "Create API Key"
-3. Copy and set as `GOOGLE_API_KEY`
-
-**Firecrawl API Key (Optional - only for cloud):**
-1. Go to [firecrawl.dev](https://firecrawl.dev)
-2. Sign up (free tier: 500 credits/month)
-3. Copy and set as `FIRECRAWL_API_KEY`
+```env
+GOOGLE_API_KEY=your_google_api_key
+FIRECRAWL_API_KEY=your_firecrawl_api_key
+```
 
 ## API Reference
 
 ### `scrape_careers_page(url, company_name=None)`
 
 Scrape job listings from any careers page.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `url` | str | Careers page URL |
-| `company_name` | str | Company name (auto-detected if not provided) |
 
 **Returns:** List of job dictionaries:
 
@@ -220,14 +178,6 @@ Scrape job listings from any careers page.
 ### `process_jobs(jobs, enrich=True, filter_categories=None)`
 
 Process and enrich jobs with AI.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `jobs` | list | Jobs from `scrape_careers_page()` |
-| `enrich` | bool | Enable AI enrichment (default: True) |
-| `filter_categories` | list | Filter to specific categories |
 
 **Returns:** Enriched job dictionaries with additional fields:
 
@@ -260,24 +210,6 @@ OpenJobs classifies jobs into 10 categories:
 | **Finance/Legal & Compliance** | Finance, Legal |
 | **Other Engineering** | Hardware, IT Support |
 
-## Docker Commands
-
-```bash
-# Start Firecrawl
-./start.sh
-# or
-docker compose up -d
-
-# Stop Firecrawl
-docker compose down
-
-# View logs
-docker compose logs -f
-
-# Restart
-docker compose restart
-```
-
 ## Supported Websites
 
 OpenJobs works with virtually any careers page:
@@ -286,6 +218,14 @@ OpenJobs works with virtually any careers page:
 - **ATS platforms**: Greenhouse, Lever, Workable, BambooHR, Ashby
 - **Custom sites**: React, Vue, Angular SPAs
 - **International sites**: Any language (extracted in English)
+
+## Self-Hosting Firecrawl (Optional)
+
+For unlimited scraping, you can self-host Firecrawl. See the [official self-hosting guide](https://docs.firecrawl.dev/contributing/self-host).
+
+```bash
+export FIRECRAWL_URL=http://your-firecrawl-instance:3002
+```
 
 ## Security
 
