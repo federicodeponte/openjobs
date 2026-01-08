@@ -17,11 +17,20 @@ Requirements:
 """
 
 import json
-from openjobs import scrape_careers_page, process_jobs
+from openjobs import scrape_careers_page, process_jobs, discover_careers_url
 
-# Example 1: Basic scraping
+# Example 1: Discover careers page from domain
 print("=" * 60)
-print("Example 1: Basic Scraping")
+print("Example 1: Discover Careers Page")
+print("=" * 60)
+
+# Find careers page URL from just the domain
+careers_url = discover_careers_url("stripe.com")
+print(f"\nstripe.com careers page: {careers_url}")
+
+# Example 2: Basic scraping
+print("=" * 60)
+print("Example 2: Basic Scraping")
 print("=" * 60)
 
 jobs = scrape_careers_page(
@@ -39,9 +48,9 @@ for job in jobs[:5]:  # Show first 5
     print(f"    URL: {job['job_url']}")
     print()
 
-# Example 2: With AI enrichment
+# Example 3: With AI enrichment
 print("=" * 60)
-print("Example 2: With AI Enrichment")
+print("Example 3: With AI Enrichment")
 print("=" * 60)
 
 if jobs:
@@ -59,9 +68,9 @@ if jobs:
             print(f"  Salary: {job['salary_range']}")
         print()
 
-# Example 3: Filter by category
+# Example 4: Filter by category
 print("=" * 60)
-print("Example 3: Filter by Category")
+print("Example 4: Filter by Category")
 print("=" * 60)
 
 if jobs:
@@ -74,9 +83,9 @@ if jobs:
 
     print(f"\nFound {len(engineering_jobs)} engineering/data jobs")
 
-# Example 4: Export to JSON
+# Example 5: Export to JSON
 print("=" * 60)
-print("Example 4: Export to JSON")
+print("Example 5: Export to JSON")
 print("=" * 60)
 
 if jobs:

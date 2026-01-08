@@ -7,6 +7,7 @@ Uses Firecrawl for JavaScript rendering and Gemini AI for job extraction.
 import ipaddress
 import json
 import os
+import re
 import socket
 import threading
 import time
@@ -36,6 +37,22 @@ SLOW_SPA_WAIT_MS = 8000  # Extra time for heavy JS sites
 SLOW_SITE_PATTERNS = [
     'workday', 'lever.co', 'greenhouse.io', 'bamboohr',
     'careers.', 'jobs.', 'apply.', 'hire.'
+]
+
+# Heavy SPA sites that need extended wait + scroll actions
+HEAVY_SPA_WAIT_MS = 15000  # 15 seconds for very heavy JS sites
+HEAVY_SPA_PATTERNS = ['retool', 'airtable', 'vercel', 'notion', 'figma']
+
+# Common careers page paths to try during discovery
+COMMON_CAREERS_PATHS = [
+    '/careers',
+    '/jobs',
+    '/careers/jobs',
+    '/about/careers',
+    '/company/careers',
+    '/join',
+    '/join-us',
+    '/work-with-us',
 ]
 
 
@@ -190,9 +207,73 @@ Example output:
 [{"title": "Software Engineer", "department": "Engineering", "location": "Remote", "url": "https://..."}]"""
 
 
+def _firecrawl_request(
+    url: str,
+    wait_ms: int,
+    api_key: Optional[str] = None,
+    with_scroll: bool = False
+) -> str:
+    """
+    Make a single Firecrawl request with optional scroll actions.
+
+    Args:
+        url: The URL to scrape
+        wait_ms: Milliseconds to wait for JS rendering
+        api_key: Optional Firecrawl API key
+        with_scroll: If True, add scroll actions (cloud Firecrawl only)
+
+    Returns:
+        Markdown content or empty string on failure
+    """
+    try:
+        headers = {}
+        firecrawl_api_key = api_key or FIRECRAWL_API_KEY
+        if firecrawl_api_key:
+            headers["Authorization"] = f"Bearer {firecrawl_api_key}"
+
+        payload = {
+            "url": url,
+            "formats": ["markdown"],
+            "waitFor": wait_ms,
+            "timeout": 60000,
+        }
+
+        # Add scroll actions only for cloud Firecrawl (self-hosted doesn't support it)
+        is_cloud = firecrawl_api_key or 'api.firecrawl.dev' in FIRECRAWL_URL
+        if with_scroll and is_cloud:
+            payload["actions"] = [
+                {"type": "scroll", "direction": "down"},
+                {"type": "wait", "milliseconds": 2000},
+                {"type": "scroll", "direction": "down"},
+                {"type": "wait", "milliseconds": 2000},
+                {"type": "scroll", "direction": "down"},
+            ]
+            logger.debug(f"Using scroll actions for {url}")
+
+        data = post_json_with_retry(
+            f"{FIRECRAWL_URL}/v1/scrape",
+            json_body=payload,
+            headers=headers if headers else None,
+            timeout=90 if with_scroll else 60
+        )
+
+        if not data:
+            return ""
+
+        return data.get('data', {}).get('markdown', '')
+
+    except Exception as e:
+        logger.debug(f"Firecrawl request failed: {e}")
+        return ""
+
+
 def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     """
     Scrape a URL using Firecrawl and return markdown content.
+
+    Uses tiered approach:
+    1. Standard scrape with appropriate wait time
+    2. For heavy SPAs, retry with extended wait + scroll actions
 
     Args:
         url: The URL to scrape
@@ -204,39 +285,38 @@ def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     # Apply rate limiting before making request
     firecrawl_rate_limiter.wait()
 
-    # Determine wait time based on URL patterns
     url_lower = url.lower()
+
+    # Determine initial wait time based on URL patterns
     wait_time = DEFAULT_WAIT_MS
     if any(pattern in url_lower for pattern in SLOW_SITE_PATTERNS):
         wait_time = SLOW_SPA_WAIT_MS
         logger.debug(f"Using extended wait time ({wait_time}ms) for slow site: {url}")
 
-    try:
-        headers = {}
-        firecrawl_api_key = api_key or FIRECRAWL_API_KEY
-        if firecrawl_api_key:
-            headers["Authorization"] = f"Bearer {firecrawl_api_key}"
+    # Check if this is a heavy SPA site
+    is_heavy_spa = any(pattern in url_lower for pattern in HEAVY_SPA_PATTERNS)
 
-        data = post_json_with_retry(
-            f"{FIRECRAWL_URL}/v1/scrape",
-            json_body={
-                "url": url,
-                "formats": ["markdown"],
-                "waitFor": wait_time
-            },
-            headers=headers if headers else None,
-            timeout=60
-        )
+    # Attempt 1: Standard scrape
+    markdown = _firecrawl_request(url, wait_time, api_key)
 
-        if not data:
-            logger.error(f"Firecrawl returned empty response for {url}")
-            return ""
+    # Check if we got meaningful content (more than just boilerplate)
+    if markdown and len(markdown) > 500:
+        return markdown
 
-        return data.get('data', {}).get('markdown', '')
+    # Attempt 2: For heavy SPAs, retry with scroll actions
+    if is_heavy_spa:
+        logger.info(f"Retrying {url} with heavy SPA mode (scroll + {HEAVY_SPA_WAIT_MS}ms wait)")
+        firecrawl_rate_limiter.wait()  # Rate limit the retry too
+        markdown = _firecrawl_request(url, HEAVY_SPA_WAIT_MS, api_key, with_scroll=True)
 
-    except Exception as e:
-        logger.error(f"Firecrawl request failed: {e}")
-        return ""
+        if markdown and len(markdown) > 500:
+            return markdown
+
+    # Return whatever we got (might be empty)
+    if not markdown:
+        logger.error(f"Firecrawl returned empty response for {url}")
+
+    return markdown or ""
 
 
 def extract_jobs_from_markdown(
@@ -408,6 +488,146 @@ def scrape_careers_page(
         jobs_data.append(job_entry)
 
     return jobs_data
+
+
+def _check_url_exists(url: str) -> bool:
+    """Quick HEAD request to check if URL exists and returns 200."""
+    try:
+        response = requests.head(url, timeout=5, allow_redirects=True)
+        return response.status_code == 200
+    except Exception:
+        return False
+
+
+def _search_careers_with_gemini(domain: str, api_key: str) -> Optional[str]:
+    """
+    Use Gemini with Google Search grounding to find careers page.
+
+    Args:
+        domain: Company domain (e.g., "stripe.com")
+        api_key: Google API key
+
+    Returns:
+        Best careers page URL or None
+    """
+    try:
+        prompt = f"""Find the careers or jobs page URL for {domain}.
+
+I need the exact URL where job listings are displayed, not just a landing page.
+For example, stripe.com's jobs are at stripe.com/jobs/search, not stripe.com/jobs.
+
+Return ONLY the URL, nothing else. If you cannot find it, return "NONE"."""
+
+        response = requests.post(
+            f"{GEMINI_URL}?key={api_key}",
+            json={
+                "contents": [{"parts": [{"text": prompt}]}],
+                "tools": [{"google_search": {}}],
+                "generationConfig": {"temperature": 0.1}
+            },
+            timeout=30
+        )
+
+        if response.status_code != 200:
+            logger.debug(f"Gemini search failed: {response.status_code}")
+            return None
+
+        result = response.json()
+
+        # Extract text from response
+        text = ""
+        if 'candidates' in result and result['candidates']:
+            parts = result['candidates'][0].get('content', {}).get('parts', [])
+            for part in parts:
+                if 'text' in part:
+                    text += part['text']
+
+        text = text.strip()
+        if not text or text.upper() == "NONE":
+            return None
+
+        # Extract URL from response (might have extra text or markdown)
+        # Try full URL first (stop at common terminators)
+        url_match = re.search(r'https?://[^\s<>"\')\]]+', text)
+        if url_match:
+            found_url = url_match.group(0).rstrip('.,;:')
+            if domain.replace('www.', '') in found_url:
+                return found_url
+
+        # Try domain/path pattern (e.g., "stripe.com/jobs")
+        domain_path_match = re.search(rf'{re.escape(domain)}[/\w-]*', text, re.IGNORECASE)
+        if domain_path_match:
+            found_path = domain_path_match.group(0).rstrip('.,;:')
+            return f"https://{found_path}"
+
+        return None
+
+    except Exception as e:
+        logger.debug(f"Gemini search error: {e}")
+        return None
+
+
+def discover_careers_url(
+    domain: str,
+    google_api_key: Optional[str] = None
+) -> Optional[str]:
+    """
+    Discover the careers page URL for a company domain.
+
+    Uses a two-step approach:
+    1. Try common paths (/careers, /jobs, etc.) - no API cost
+    2. If not found, use Gemini with Google Search grounding
+
+    Args:
+        domain: Company domain (e.g., "stripe.com", "anthropic.com")
+        google_api_key: Optional Google API key (uses env var if not provided)
+
+    Returns:
+        Best careers page URL or None if not found
+
+    Example:
+        >>> discover_careers_url("stripe.com")
+        'https://stripe.com/jobs/search'
+    """
+    # Clean domain
+    domain = domain.lower().strip()
+    if domain.startswith('http'):
+        domain = urlparse(domain).netloc
+    domain = domain.replace('www.', '')
+
+    logger.info(f"Discovering careers page for {domain}")
+
+    # Step 1: Try common paths (free, no API call)
+    base_url = f"https://{domain}"
+    for path in COMMON_CAREERS_PATHS:
+        test_url = f"{base_url}{path}"
+        if _check_url_exists(test_url):
+            logger.info(f"Found careers page at common path: {test_url}")
+            return test_url
+
+    # Also try with www
+    base_url_www = f"https://www.{domain}"
+    for path in COMMON_CAREERS_PATHS:
+        test_url = f"{base_url_www}{path}"
+        if _check_url_exists(test_url):
+            logger.info(f"Found careers page at common path: {test_url}")
+            return test_url
+
+    # Step 2: Use Gemini with Google Search
+    api_key = google_api_key or GOOGLE_API_KEY
+    if not api_key:
+        logger.warning("No Google API key for Gemini search")
+        return None
+
+    logger.info(f"Searching for {domain} careers page with Gemini...")
+    found_url = _search_careers_with_gemini(domain, api_key)
+
+    if found_url:
+        logger.info(f"Found careers page via search: {found_url}")
+        return found_url
+
+    logger.info(f"Could not find careers page for {domain}")
+    return None
 
 
 def main():
