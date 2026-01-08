@@ -8,7 +8,7 @@ AI-powered job scraper that extracts listings from any careers page using Firecr
 
 ```bash
 # Clone and start Firecrawl locally
-git clone https://github.com/yourusername/openjobs.git
+git clone https://github.com/federicodeponte/openjobs.git
 cd openjobs
 docker compose up -d
 
@@ -31,7 +31,7 @@ for job in scrape_careers_page('https://linear.app/careers'):
 
 ```bash
 pip install requests tenacity
-git clone https://github.com/yourusername/openjobs.git
+git clone https://github.com/federicodeponte/openjobs.git
 cd openjobs
 
 # Set API keys (both have free tiers)

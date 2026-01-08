@@ -5,8 +5,15 @@ This example shows how to scrape jobs from a careers page
 and optionally enrich them with AI.
 
 Requirements:
+    # Google API key (required) - free at https://aistudio.google.com/apikey
     export GOOGLE_API_KEY=your_key
-    export FIRECRAWL_API_KEY=your_key
+
+    # Option 1: Self-hosted Firecrawl (free, unlimited)
+    # Run: docker compose up -d
+    export FIRECRAWL_URL=http://localhost:3002
+
+    # Option 2: Firecrawl Cloud (500 free/month)
+    # export FIRECRAWL_API_KEY=your_key
 """
 
 import json
