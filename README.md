@@ -4,8 +4,32 @@ AI-powered job scraper that extracts listings from any careers page using Firecr
 
 ## Quick Start
 
+### Option 1: Self-Hosted (Recommended - Unlimited Free Scraping)
+
 ```bash
-# Install
+# Clone and start Firecrawl locally
+git clone https://github.com/yourusername/openjobs.git
+cd openjobs
+docker compose up -d
+
+# Wait ~30 seconds for services to start, then:
+pip install requests tenacity
+
+# Set only your Gemini key (free: https://aistudio.google.com/apikey)
+export GOOGLE_API_KEY=your_key
+export FIRECRAWL_URL=http://localhost:3002
+
+# Run
+python -c "
+from openjobs import scrape_careers_page
+for job in scrape_careers_page('https://linear.app/careers'):
+    print(f\"- {job['title']} ({job['location']})\")
+"
+```
+
+### Option 2: Firecrawl Cloud (Easiest)
+
+```bash
 pip install requests tenacity
 git clone https://github.com/yourusername/openjobs.git
 cd openjobs
@@ -14,7 +38,6 @@ cd openjobs
 export GOOGLE_API_KEY=your_key      # Free: https://aistudio.google.com/apikey
 export FIRECRAWL_API_KEY=your_key   # Free 500/month: https://firecrawl.dev
 
-# Run
 python -c "
 from openjobs import scrape_careers_page
 for job in scrape_careers_page('https://linear.app/careers'):
@@ -86,20 +109,36 @@ engineering = process_jobs(jobs, filter_categories=["Software Engineering", "Dat
 - People/HR/Recruitment
 - Finance/Legal & Compliance
 
+## Self-Hosting Firecrawl
+
+The included `docker-compose.yml` runs Firecrawl locally with all dependencies:
+
+```bash
+# Start services
+docker compose up -d
+
+# Check status
+docker compose ps
+
+# Stop services
+docker compose down
+```
+
+Services included:
+- **Redis** - Job queue
+- **PostgreSQL** - Job metadata storage
+- **RabbitMQ** - Message broker
+- **Playwright** - Browser rendering
+- **Firecrawl API** - Main scraping service (port 3002)
+
+Set `FIRECRAWL_URL=http://localhost:3002` to use local instance.
+
 ## API Keys
 
 | Service | Free Tier | Link |
 |---------|-----------|------|
 | Google Gemini | Generous | [aistudio.google.com](https://aistudio.google.com/apikey) |
-| Firecrawl | 500 credits/month | [firecrawl.dev](https://firecrawl.dev) |
-
-## Self-Hosting Firecrawl
-
-For unlimited scraping, self-host Firecrawl. See [official docs](https://docs.firecrawl.dev/contributing/self-host).
-
-```bash
-export FIRECRAWL_URL=http://your-instance:3002
-```
+| Firecrawl Cloud | 500 credits/month | [firecrawl.dev](https://firecrawl.dev) |
 
 ## License
 

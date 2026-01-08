@@ -4,15 +4,16 @@ OpenJobs Processor - AI-powered job enrichment using Gemini
 Enhance scraped job listings with structured data extraction.
 """
 
+import json
 import os
 import re
-import json
-import time
 import threading
-import requests
+import time
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import requests
 
 from .logger import logger
 

@@ -4,20 +4,21 @@ OpenJobs Scraper - Scrape job listings from any careers page
 Uses Firecrawl for JavaScript rendering and Gemini AI for job extraction.
 """
 
-import os
-import json
-import time
-import threading
 import ipaddress
+import json
+import os
 import socket
-import requests
-from urllib.parse import urlparse
+import threading
+import time
 from datetime import datetime, timedelta
-from typing import List, Dict, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
+from urllib.parse import urlparse
 
+import requests
+
+from .http_utils import post_json_with_retry
 from .logger import logger
 from .utils import create_slug
-from .http_utils import post_json_with_retry
 
 # Configuration
 # Firecrawl Cloud: Get free API key at https://firecrawl.dev (500 credits/month free)
@@ -409,14 +410,14 @@ def scrape_careers_page(
     return jobs_data
 
 
-# CLI interface
-if __name__ == "__main__":
+def main():
+    """CLI entry point for openjobs scraper."""
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python -m openjobs.scraper <careers_url> [company_name]")
+        print("Usage: openjobs <careers_url> [company_name]")
         print("\nExample:")
-        print("  python -m openjobs.scraper https://linear.app/careers Linear")
+        print("  openjobs https://linear.app/careers Linear")
         sys.exit(1)
 
     url = sys.argv[1]
@@ -438,3 +439,8 @@ if __name__ == "__main__":
             print()
     else:
         print("\nNo jobs found.")
+
+
+# CLI interface
+if __name__ == "__main__":
+    main()

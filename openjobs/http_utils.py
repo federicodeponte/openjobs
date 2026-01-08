@@ -3,13 +3,14 @@ OpenJobs HTTP Utilities - Resilient HTTP requests with retry logic
 """
 
 import logging
+
 import requests
 from tenacity import (
+    before_sleep_log,
     retry,
+    retry_if_exception,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception,
-    before_sleep_log
 )
 
 logger = logging.getLogger(__name__)

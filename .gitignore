@@ -50,3 +50,8 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Output files
+scraped_jobs.json
+*.json.bak
+test_results/
