@@ -1,0 +1,20 @@
+[
+  {
+    "company": "Linear",
+    "openjobs_count": 17,
+    "verification": "completed",
+    "details": "AgentHistoryList(all_results=[ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long_term_memory='Found initial url and automatically loaded it. Navigated to https://linear.app/careers', extracted_content='\ud83d\udd17 Navigated to https://linear.app/careers', include_extracted_content_only_once=False, metadata=None, include_in_memory=False), ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long_term_memo"
+  },
+  {
+    "company": "Raycast",
+    "openjobs_count": 2,
+    "verification": "completed",
+    "details": "AgentHistoryList(all_results=[ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long_term_memory='Found initial url and automatically loaded it. Navigated to https://www.raycast.com/careers', extracted_content='\ud83d\udd17 Navigated to https://www.raycast.com/careers', include_extracted_content_only_once=False, metadata=None, include_in_memory=False), ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long"
+  },
+  {
+    "company": "PostHog",
+    "openjobs_count": 19,
+    "verification": "completed",
+    "details": "AgentHistoryList(all_results=[ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long_term_memory='Found initial url and automatically loaded it. Navigated to https://posthog.com/careers', extracted_content='\ud83d\udd17 Navigated to https://posthog.com/careers', include_extracted_content_only_once=False, metadata=None, include_in_memory=False), ActionResult(is_done=False, success=None, judgement=None, error=None, attachments=None, images=None, long_term_me"
+  }
+]

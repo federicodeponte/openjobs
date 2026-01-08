@@ -1,0 +1,516 @@
+{
+  "test_date": "2026-01-08T16:45:58.083002",
+  "summary": {
+    "companies_tested": 5,
+    "successful": 5,
+    "total_jobs": 38
+  },
+  "results": [
+    {
+      "company": "Linear",
+      "url": "https://linear.app/careers",
+      "status": "success",
+      "job_count": 17,
+      "jobs": [
+        {
+          "company": "Linear",
+          "title": "Account Executive (Enterprise)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/1bfdcabe-aa5f-4999-9a6d-b8a824dd779b",
+          "slug": "linear-account-executive-enterprise",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive (Growth)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/453f1ba0-a35e-4ed2-8215-1514e0a30b92",
+          "slug": "linear-account-executive-growth",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive (Startups)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/c21af93e-210f-4969-8eaa-90fb16a5b720",
+          "slug": "linear-account-executive-startups",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive, APAC",
+          "department": "GTM",
+          "location": "Australia",
+          "job_url": "https://linear.app/careers/82778dbf-711e-4d23-9d49-4a60db76737a",
+          "slug": "linear-account-executive-apac",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive, EU (Enterprise)",
+          "department": "GTM",
+          "location": "London",
+          "job_url": "https://linear.app/careers/3adaa1f5-2cf1-480d-8daf-92345ec08395",
+          "slug": "linear-account-executive-eu-enterprise",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Customer Success Manager, EU",
+          "department": "GTM",
+          "location": "London",
+          "job_url": "https://linear.app/careers/c3457e89-9ac2-4017-93d5-d1a7935782a0",
+          "slug": "linear-customer-success-manager-eu",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Event Marketing Lead",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/8b8be501-de8e-4aab-aaf7-fe0644fb68ff",
+          "slug": "linear-event-marketing-lead",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Scaled Customer Success Manager",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/ef9037bf-747d-4575-93b9-906959438a6c",
+          "slug": "linear-scaled-customer-success-manager",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Solutions Engineer",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/a8041e0e-350e-47d0-9190-454089216fb8",
+          "slug": "linear-solutions-engineer",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Writer",
+          "department": "GTM",
+          "location": "Europe, North America",
+          "job_url": "https://linear.app/careers/4ed3c338-eae1-4f6a-ac0d-5dcba77f0261",
+          "slug": "linear-writer",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Designer (Web & Brand)",
+          "department": "Magic Team",
+          "location": "Europe, North America",
+          "job_url": "https://linear.app/careers/4f10c2ca-d19a-42b5-9e1f-d1794c43dd89",
+          "slug": "linear-designer-web-brand",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Engineering Leader, US",
+          "department": "Product",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/e85e752a-b1d7-4695-b163-172b0ed19ce0",
+          "slug": "linear-engineering-leader-us",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Senior / Staff Backend Engineer",
+          "department": "Product",
+          "location": "Europe",
+          "job_url": "https://linear.app/careers/a014beba-035a-436a-9cd9-9792a06c493e",
+          "slug": "linear-senior-staff-backend-engineer",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Senior / Staff Fullstack Engineer",
+          "department": "Product",
+          "location": "Europe, North America",
+          "job_url": "https://linear.app/careers/d3bc1ced-3ce4-4086-a050-555055dbb1ff",
+          "slug": "linear-senior-staff-fullstack-engineer",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Senior / Staff Product Engineer",
+          "department": "Product",
+          "location": "Europe, North America",
+          "job_url": "https://linear.app/careers/069c4628-88d7-4e4d-b393-c996fc7f3076",
+          "slug": "linear-senior-staff-product-engineer",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Senior / Staff Product Engineer (AI)",
+          "department": "Product",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/b4a7764e-c680-4bdf-9956-dc78f2ca94d5",
+          "slug": "linear-senior-staff-product-engineer-ai",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Product Support Specialist, APAC",
+          "department": "Product Support",
+          "location": "Australia",
+          "job_url": "https://linear.app/careers/0b120d06-575f-4e71-9724-68f38de6824a",
+          "slug": "linear-product-support-specialist-apac",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        }
+      ],
+      "sample": [
+        {
+          "company": "Linear",
+          "title": "Account Executive (Enterprise)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/1bfdcabe-aa5f-4999-9a6d-b8a824dd779b",
+          "slug": "linear-account-executive-enterprise",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive (Growth)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/453f1ba0-a35e-4ed2-8215-1514e0a30b92",
+          "slug": "linear-account-executive-growth",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        },
+        {
+          "company": "Linear",
+          "title": "Account Executive (Startups)",
+          "department": "GTM",
+          "location": "North America",
+          "job_url": "https://linear.app/careers/c21af93e-210f-4969-8eaa-90fb16a5b720",
+          "slug": "linear-account-executive-startups",
+          "date_scraped": "2026-01-08T16:45:14.827825",
+          "source_url": "https://linear.app/careers"
+        }
+      ]
+    },
+    {
+      "company": "Raycast",
+      "url": "https://www.raycast.com/careers",
+      "status": "success",
+      "job_count": 2,
+      "jobs": [
+        {
+          "company": "Raycast",
+          "title": "Design Engineer",
+          "department": null,
+          "location": "CET \u00b1 3 hours timezone",
+          "job_url": "https://www.raycast.com/jobs/design-engineer",
+          "slug": "raycast-design-engineer",
+          "date_scraped": "2026-01-08T16:45:19.274593",
+          "source_url": "https://www.raycast.com/careers"
+        },
+        {
+          "company": "Raycast",
+          "title": "Sales & Solutions Specialist",
+          "department": null,
+          "location": "CET \u00b1 3 hours timezone",
+          "job_url": "https://www.raycast.com/jobs/sales-solutions-specialist",
+          "slug": "raycast-sales-solutions-specialist",
+          "date_scraped": "2026-01-08T16:45:19.274593",
+          "source_url": "https://www.raycast.com/careers"
+        }
+      ],
+      "sample": [
+        {
+          "company": "Raycast",
+          "title": "Design Engineer",
+          "department": null,
+          "location": "CET \u00b1 3 hours timezone",
+          "job_url": "https://www.raycast.com/jobs/design-engineer",
+          "slug": "raycast-design-engineer",
+          "date_scraped": "2026-01-08T16:45:19.274593",
+          "source_url": "https://www.raycast.com/careers"
+        },
+        {
+          "company": "Raycast",
+          "title": "Sales & Solutions Specialist",
+          "department": null,
+          "location": "CET \u00b1 3 hours timezone",
+          "job_url": "https://www.raycast.com/jobs/sales-solutions-specialist",
+          "slug": "raycast-sales-solutions-specialist",
+          "date_scraped": "2026-01-08T16:45:19.274593",
+          "source_url": "https://www.raycast.com/careers"
+        }
+      ]
+    },
+    {
+      "company": "PostHog",
+      "url": "https://posthog.com/careers",
+      "status": "success",
+      "job_count": 19,
+      "jobs": [
+        {
+          "company": "PostHog",
+          "title": "Product Engineer",
+          "department": "Multiple teams",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-0",
+          "slug": "posthog-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "AI Product Engineer",
+          "department": "Multiple teams",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-1",
+          "slug": "posthog-ai-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Backend Engineer - Error Tracking",
+          "department": null,
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-2",
+          "slug": "posthog-backend-engineer-error-tracking",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "ClickHouse Operations Engineer",
+          "department": "ClickHouse Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-3",
+          "slug": "posthog-clickhouse-operations-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "DevEx Engineer",
+          "department": "Developer Experience Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-4",
+          "slug": "posthog-devex-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Platform Engineer",
+          "department": "Infrastructure Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-5",
+          "slug": "posthog-platform-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Product Manager (ex-founder or ex-product engineer)",
+          "department": null,
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-6",
+          "slug": "posthog-product-manager-ex-founder-or-ex-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Software Engineer \u2014 Data Stack Tooling",
+          "department": "Data Stack Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-7",
+          "slug": "posthog-software-engineer-data-stack-tooling",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Software Engineer \u2014 Warehouse Pipelines",
+          "department": "Data Stack Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-8",
+          "slug": "posthog-software-engineer-warehouse-pipelines",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Technical Ex-Founder",
+          "department": "Multiple teams",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-9",
+          "slug": "posthog-technical-ex-founder",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Developer Who Organizes Events",
+          "department": "Marketing Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-10",
+          "slug": "posthog-developer-who-organizes-events",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Talent Partner",
+          "department": "Talent Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-11",
+          "slug": "posthog-talent-partner",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Influencer Wrangler",
+          "department": "Marketing Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-12",
+          "slug": "posthog-influencer-wrangler",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Propagandist",
+          "department": "Demand Gen Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-13",
+          "slug": "posthog-propagandist",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Developer Marketer",
+          "department": "Marketing Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-14",
+          "slug": "posthog-developer-marketer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Technical Account Manager",
+          "department": "Product-Led Sales Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-15",
+          "slug": "posthog-technical-account-manager",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Forward Deployed Engineer",
+          "department": "New Business Sales Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-16",
+          "slug": "posthog-forward-deployed-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "YC Founder Whisperer",
+          "department": "Customer Success Team",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-17",
+          "slug": "posthog-yc-founder-whisperer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Product Engineer",
+          "department": null,
+          "location": "Remote",
+          "job_url": "https://posthog.com/careers/product-engineer",
+          "slug": "posthog-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        }
+      ],
+      "sample": [
+        {
+          "company": "PostHog",
+          "title": "Product Engineer",
+          "department": "Multiple teams",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-0",
+          "slug": "posthog-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "AI Product Engineer",
+          "department": "Multiple teams",
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-1",
+          "slug": "posthog-ai-product-engineer",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        },
+        {
+          "company": "PostHog",
+          "title": "Backend Engineer - Error Tracking",
+          "department": null,
+          "location": null,
+          "job_url": "https://posthog.com/careers#job-2",
+          "slug": "posthog-backend-engineer-error-tracking",
+          "date_scraped": "2026-01-08T16:45:24.043617",
+          "source_url": "https://posthog.com/careers"
+        }
+      ]
+    },
+    {
+      "company": "Notion",
+      "url": "https://www.notion.so/careers",
+      "status": "success",
+      "job_count": 0,
+      "jobs": [],
+      "sample": []
+    },
+    {
+      "company": "Cal.com",
+      "url": "https://cal.com/careers",
+      "status": "success",
+      "job_count": 0,
+      "jobs": [],
+      "sample": []
+    }
+  ]
+}
