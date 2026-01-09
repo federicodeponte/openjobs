@@ -39,7 +39,7 @@ jobs:
           pytest tests/ --cov=openjobs --cov-report=xml --cov-report=term -m "not slow"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
