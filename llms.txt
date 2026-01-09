@@ -1,0 +1,88 @@
+# OpenJobs
+
+> AI-powered job scraper for extracting job listings from any careers page
+
+## What is OpenJobs?
+
+OpenJobs is a Python library that scrapes job listings from company careers pages using:
+- Firecrawl for JavaScript rendering (handles React, Next.js, Vue SPAs)
+- Google Gemini AI for intelligent job extraction
+- Fallback embedded JSON extraction for React/Next.js data structures
+
+## Quick Start
+
+```python
+from openjobs import scrape_careers_page, discover_careers_url
+
+# Scrape jobs from a careers page
+jobs = scrape_careers_page("https://stripe.com/jobs")
+
+# Or discover the careers URL first
+url = discover_careers_url("anthropic.com")
+jobs = scrape_careers_page(url)
+```
+
+## Core Functions
+
+### scrape_careers_page(url, company_name=None)
+Scrape job listings from a careers page URL.
+Returns: List of job dicts with title, company, location, department, job_url, slug, date_scraped
+
+### discover_careers_url(domain)
+Find the careers page URL from a company domain.
+Example: discover_careers_url("stripe.com") -> "https://stripe.com/jobs/search"
+
+### process_jobs(jobs, enrich=True, filter_categories=None)
+Enrich jobs with AI categorization, tech stack extraction, salary parsing.
+Categories: Software Engineering, Data, Product, Design, Sales, Marketing, etc.
+
+## Environment Variables
+
+- GOOGLE_API_KEY (required): Gemini API key for AI extraction
+- FIRECRAWL_URL: Self-hosted Firecrawl URL (default: cloud API)
+- FIRECRAWL_API_KEY: Firecrawl cloud API key
+
+## Output Format
+
+```json
+{
+  "company": "Linear",
+  "title": "Senior Software Engineer",
+  "department": "Product",
+  "location": "Remote",
+  "job_url": "https://linear.app/careers/...",
+  "slug": "linear-senior-software-engineer",
+  "date_scraped": "2025-01-08T10:00:00"
+}
+```
+
+## Supported Sites
+
+Works with most careers pages including:
+- Company websites (stripe.com, linear.app, figma.com)
+- JavaScript SPAs (React, Next.js, Vue)
+- ATS platforms (Lever, Greenhouse, Ashby)
+- Heavy SPAs (Retool, Airtable, Vercel, Notion)
+
+Not supported: LinkedIn, Indeed, Glassdoor (blocked by ToS)
+
+## Installation
+
+```bash
+pip install requests tenacity
+git clone https://github.com/federicodeponte/openjobs.git
+```
+
+## Self-Hosted Firecrawl
+
+For unlimited free scraping:
+```bash
+docker compose up -d
+export FIRECRAWL_URL=http://localhost:3002
+```
+
+## Links
+
+- Repository: https://github.com/federicodeponte/openjobs
+- Firecrawl: https://firecrawl.dev
+- Gemini API: https://aistudio.google.com/apikey

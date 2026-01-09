@@ -1,0 +1,222 @@
+# OpenJobs - Complete Documentation for AI Assistants
+
+## Overview
+
+OpenJobs is a Python library for scraping job listings from company careers pages. It uses Firecrawl for JavaScript rendering and Google Gemini AI for intelligent extraction.
+
+## Problem It Solves
+
+Scraping careers pages is hard because:
+1. Most use JavaScript frameworks (React, Next.js, Vue)
+2. Job data is often embedded in complex data structures
+3. Each site has different HTML structure
+4. ATS systems (Lever, Greenhouse) have varying formats
+
+OpenJobs solves this with a universal approach that works on any site.
+
+## Architecture
+
+```
+User provides URL
+       │
+       ▼
+┌─────────────────────────────────────────────────────┐
+│ 1. URL Validation (SSRF protection)                 │
+└─────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────┐
+│ 2. Firecrawl Scraping (tiered approach)             │
+│    - Standard scrape (5s wait)                      │
+│    - Extended wait for heavy SPAs (15s + scroll)    │
+│    - Raw HTML fallback if needed                    │
+└─────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────┐
+│ 3. Job Extraction                                    │
+│    - Try embedded JSON extraction first (free)      │
+│    - Fall back to Gemini AI parsing                 │
+└─────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────┐
+│ 4. Output: Structured job listings                   │
+└─────────────────────────────────────────────────────┘
+```
+
+## Complete API Reference
+
+### Main Functions
+
+#### scrape_careers_page(url, company_name=None, firecrawl_api_key=None, google_api_key=None)
+Main entry point for scraping jobs.
+
+Parameters:
+- url: Careers page URL to scrape
+- company_name: Optional company name (extracted from URL if not provided)
+- firecrawl_api_key: Optional Firecrawl API key
+- google_api_key: Optional Google API key
+
+Returns: List[Dict] with keys:
+- company: Company name
+- title: Job title
+- department: Department (optional)
+- location: Location (optional)
+- job_url: Direct link to job posting
+- slug: URL-friendly identifier
+- date_scraped: ISO timestamp
+- source_url: Original careers page URL
+
+#### discover_careers_url(domain, google_api_key=None)
+Find careers page URL from company domain.
+
+Parameters:
+- domain: Company domain (e.g., "stripe.com")
+- google_api_key: Optional Google API key for Gemini search
+
+Returns: str or None
+
+How it works:
+1. Tries common paths (/careers, /jobs, /careers/jobs, etc.)
+2. Falls back to Gemini with Google Search grounding
+
+#### scrape_with_firecrawl(url, api_key=None)
+Low-level function to scrape a URL and get markdown content.
+
+Returns: str (markdown content or "<!-- RAW_HTML -->..." for HTML fallback)
+
+#### extract_jobs_from_markdown(markdown, prompt=None, api_key=None)
+Low-level function to extract jobs from markdown/HTML content.
+
+Returns: List[Dict] with title, department, location, url
+
+### Processing Functions
+
+#### process_jobs(jobs, enrich=False, filter_categories=None, api_key=None)
+Process and optionally enrich job listings.
+
+Parameters:
+- jobs: List of job dicts from scrape_careers_page
+- enrich: If True, add AI enrichment (category, tech_stack, etc.)
+- filter_categories: List of categories to include
+- api_key: Optional Google API key
+
+Returns: List[Dict] with additional fields:
+- category: Job category (e.g., "Software Engineering")
+- subcategory: More specific category (e.g., "Backend Engineer")
+- tech_stack: List of technologies mentioned
+- experience_years: Required experience
+- salary_range: Salary information if found
+- contract_type: Full-time, Part-time, Contract, etc.
+
+#### process_job(job, enrich=False, api_key=None)
+Process a single job.
+
+### Utility Functions
+
+#### create_slug(company, title)
+Create URL-friendly slug from company and title.
+
+### Internal Functions (for advanced use)
+
+#### _has_job_content(content)
+Check if content has enough job-related keywords.
+
+#### _extract_embedded_jobs(html)
+Extract jobs from embedded JSON in HTML (React/Next.js patterns).
+
+#### _fetch_raw_html(url)
+Fetch raw HTML as fallback when Firecrawl fails.
+
+#### is_valid_url(url)
+Validate URL for SSRF protection.
+
+## Job Categories
+
+Available categories for filtering:
+- Software Engineering
+- Data
+- Product
+- Design
+- Operations & Strategy
+- Sales & Account Management
+- Marketing
+- People/HR/Recruitment
+- Finance/Legal & Compliance
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| GOOGLE_API_KEY | Yes | - | Gemini API key |
+| FIRECRAWL_URL | No | https://api.firecrawl.dev | Firecrawl API URL |
+| FIRECRAWL_API_KEY | No | - | Firecrawl cloud API key |
+| GEMINI_MODEL | No | gemini-2.0-flash | Gemini model to use |
+
+### Self-Hosted Firecrawl
+
+```bash
+docker compose up -d
+export FIRECRAWL_URL=http://localhost:3002
+```
+
+## Error Handling
+
+All functions handle errors gracefully:
+- Invalid URLs return empty list
+- API failures return empty list
+- Rate limiting is built-in (30 req/min)
+- SSRF attacks are blocked
+
+## Example Use Cases
+
+### 1. Scrape a single company
+```python
+from openjobs import scrape_careers_page
+jobs = scrape_careers_page("https://linear.app/careers")
+```
+
+### 2. Find and scrape careers page
+```python
+from openjobs import discover_careers_url, scrape_careers_page
+url = discover_careers_url("anthropic.com")
+if url:
+    jobs = scrape_careers_page(url)
+```
+
+### 3. Get only engineering jobs with enrichment
+```python
+from openjobs import scrape_careers_page, process_jobs
+jobs = scrape_careers_page("https://stripe.com/jobs")
+eng_jobs = process_jobs(jobs, enrich=True, filter_categories=["Software Engineering"])
+```
+
+### 4. Batch scrape multiple companies
+```python
+from openjobs import discover_careers_url, scrape_careers_page
+
+companies = ["stripe.com", "linear.app", "figma.com"]
+all_jobs = []
+
+for company in companies:
+    url = discover_careers_url(company)
+    if url:
+        jobs = scrape_careers_page(url)
+        all_jobs.extend(jobs)
+```
+
+## Limitations
+
+- Cannot scrape LinkedIn, Indeed, Glassdoor (blocked by ToS)
+- Workday ATS sites have limited support
+- Rate limited to 30 requests per minute
+- Requires API keys (Google Gemini is free)
+
+## Security
+
+- SSRF protection blocks localhost, private IPs, metadata endpoints
+- No secrets stored in code
+- API keys via environment variables only

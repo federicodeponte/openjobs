@@ -43,6 +43,38 @@ SLOW_SITE_PATTERNS = [
 HEAVY_SPA_WAIT_MS = 15000  # 15 seconds for very heavy JS sites
 HEAVY_SPA_PATTERNS = ['retool', 'airtable', 'vercel', 'notion', 'figma']
 
+# Job-related keywords for content validation
+# Used to detect if scraped content contains actual job listings
+JOB_KEYWORDS = [
+    'engineer', 'manager', 'designer', 'analyst', 'developer', 'director',
+    'coordinator', 'specialist', 'lead', 'senior', 'junior', 'associate',
+    'account executive', 'product manager', 'software engineer'
+]
+
+# Minimum keyword matches required to consider content as having job listings
+MIN_JOB_KEYWORD_MATCHES = 5
+
+
+def _has_job_content(content: str) -> bool:
+    """
+    Check if content has enough job-related keywords to indicate actual listings.
+
+    Single mentions of job keywords could just be in descriptions or benefits text,
+    so we require multiple matches to confirm the page has actual job listings.
+
+    Args:
+        content: Text content to check
+
+    Returns:
+        True if content has enough job keywords to indicate job listings
+    """
+    if not content:
+        return False
+    content_lower = content.lower()
+    match_count = sum(content_lower.count(kw) for kw in JOB_KEYWORDS)
+    return match_count >= MIN_JOB_KEYWORD_MATCHES
+
+
 # Common careers page paths to try during discovery
 COMMON_CAREERS_PATHS = [
     '/careers',
@@ -267,6 +299,111 @@ def _firecrawl_request(
         return ""
 
 
+def _fetch_raw_html(url: str) -> str:
+    """Fetch raw HTML directly as fallback when Firecrawl fails."""
+    try:
+        response = requests.get(
+            url,
+            timeout=30,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+        )
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        logger.debug(f"Raw HTML fetch failed: {e}")
+        return ""
+
+
+def _extract_embedded_jobs(html: str) -> List[Dict]:
+    """
+    Extract job listings from embedded JSON in HTML.
+
+    Many sites embed job data as JSON in React/Next.js data structures,
+    JSON-LD, or script tags. This extracts jobs without needing Gemini.
+
+    Args:
+        html: Raw HTML content
+
+    Returns:
+        List of job dicts, or empty list if no embedded jobs found
+    """
+    jobs = []
+
+    try:
+        # Pattern 1: Escaped JSON jobs array (React/Next.js)
+        # Matches: \"jobs\":[{...},{...}]
+        escaped_match = re.search(r'\\"jobs\\":\[(.*?)\](?=,\\"|\}\])', html, re.DOTALL)
+        if escaped_match:
+            jobs_str = escaped_match.group(0).replace('\\"', '"')
+            jobs_str = '{' + jobs_str + '}'
+            data = json.loads(jobs_str)
+            for job in data.get('jobs', []):
+                if job.get('title'):
+                    jobs.append({
+                        'title': job.get('title'),
+                        'department': job.get('department'),
+                        'location': job.get('location'),
+                        'url': job.get('link') or job.get('url')
+                    })
+            if jobs:
+                logger.debug(f"Extracted {len(jobs)} jobs from escaped JSON")
+                return jobs
+
+        # Pattern 2: JSON-LD JobPosting schema
+        # Matches: <script type="application/ld+json">{"@type":"JobPosting"...}</script>
+        ld_matches = re.findall(
+            r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+            html, re.DOTALL | re.IGNORECASE
+        )
+        for ld_json in ld_matches:
+            try:
+                data = json.loads(ld_json)
+                # Handle single job or array
+                items = data if isinstance(data, list) else [data]
+                for item in items:
+                    if item.get('@type') == 'JobPosting':
+                        jobs.append({
+                            'title': item.get('title'),
+                            'department': item.get('hiringOrganization', {}).get('department'),
+                            'location': item.get('jobLocation', {}).get('address', {}).get('addressLocality'),
+                            'url': item.get('url')
+                        })
+            except json.JSONDecodeError:
+                continue
+
+        if jobs:
+            logger.debug(f"Extracted {len(jobs)} jobs from JSON-LD")
+            return jobs
+
+        # Pattern 3: Unescaped JSON jobs array in script tags
+        # Matches: "jobs":[{...},{...}] or 'jobs':[{...},{...}]
+        unescaped_match = re.search(r'"jobs"\s*:\s*\[(.*?)\]', html, re.DOTALL)
+        if unescaped_match:
+            try:
+                jobs_str = '[' + unescaped_match.group(1) + ']'
+                job_list = json.loads(jobs_str)
+                for job in job_list:
+                    if isinstance(job, dict) and job.get('title'):
+                        jobs.append({
+                            'title': job.get('title'),
+                            'department': job.get('department'),
+                            'location': job.get('location'),
+                            'url': job.get('link') or job.get('url')
+                        })
+                if jobs:
+                    logger.debug(f"Extracted {len(jobs)} jobs from unescaped JSON")
+                    return jobs
+            except json.JSONDecodeError:
+                pass
+
+    except Exception as e:
+        logger.debug(f"Embedded job extraction error: {e}")
+
+    return jobs
+
+
 def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     """
     Scrape a URL using Firecrawl and return markdown content.
@@ -274,6 +411,7 @@ def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     Uses tiered approach:
     1. Standard scrape with appropriate wait time
     2. For heavy SPAs, retry with extended wait + scroll actions
+    3. Fallback to raw HTML if Firecrawl returns minimal content
 
     Args:
         url: The URL to scrape
@@ -299,18 +437,31 @@ def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     # Attempt 1: Standard scrape
     markdown = _firecrawl_request(url, wait_time, api_key)
 
-    # Check if we got meaningful content (more than just boilerplate)
-    if markdown and len(markdown) > 500:
+    # Check if we got meaningful content with job keywords
+    if markdown and len(markdown) > 2000 and _has_job_content(markdown):
         return markdown
 
-    # Attempt 2: For heavy SPAs, retry with scroll actions
-    if is_heavy_spa:
-        logger.info(f"Retrying {url} with heavy SPA mode (scroll + {HEAVY_SPA_WAIT_MS}ms wait)")
-        firecrawl_rate_limiter.wait()  # Rate limit the retry too
-        markdown = _firecrawl_request(url, HEAVY_SPA_WAIT_MS, api_key, with_scroll=True)
+    # Attempt 2: For heavy SPAs or content without jobs, retry with extended wait
+    if is_heavy_spa or not markdown or len(markdown) < 2000 or not _has_job_content(markdown):
+        logger.info(f"Retrying {url} with extended wait ({HEAVY_SPA_WAIT_MS}ms)")
+        firecrawl_rate_limiter.wait()
+        markdown_retry = _firecrawl_request(url, HEAVY_SPA_WAIT_MS, api_key, with_scroll=True)
 
-        if markdown and len(markdown) > 500:
+        # Use retry result if it's better
+        if markdown_retry and len(markdown_retry) > len(markdown or ""):
+            markdown = markdown_retry
+
+        if markdown and len(markdown) > 2000 and _has_job_content(markdown):
             return markdown
+
+    # Attempt 3: Fallback to raw HTML if Firecrawl content lacks job keywords
+    # Raw HTML can contain embedded JSON that we can parse directly
+    if not markdown or len(markdown) < 2000 or not _has_job_content(markdown):
+        logger.info(f"Firecrawl returned minimal content, trying raw HTML fallback for {url}")
+        raw_html = _fetch_raw_html(url)
+        if raw_html and len(raw_html) > 5000:
+            # Return HTML wrapped in a marker so extract_jobs knows it's HTML
+            return f"<!-- RAW_HTML -->\n{raw_html}"
 
     # Return whatever we got (might be empty)
     if not markdown:
@@ -319,16 +470,34 @@ def scrape_with_firecrawl(url: str, api_key: Optional[str] = None) -> str:
     return markdown or ""
 
 
+HTML_EXTRACTION_PROMPT = """Extract all job listings from this careers page HTML.
+
+IMPORTANT:
+- ONLY extract jobs that are explicitly listed in the HTML
+- Look for job titles in elements, links, headings, or JSON data embedded in the page
+- Do NOT invent or assume job titles that aren't clearly stated
+- If no jobs are clearly listed, return an empty array
+
+For each job, return a JSON object with:
+- title: job title exactly as written (required)
+- department: department or team name if stated (optional)
+- location: job location if stated (optional)
+- url: direct link to job posting if available (optional)
+
+Return ONLY a valid JSON array. No explanation, no markdown.
+If no jobs found, return: []"""
+
+
 def extract_jobs_from_markdown(
     markdown: str,
     prompt: Optional[str] = None,
     api_key: Optional[str] = None
 ) -> List[Dict]:
     """
-    Use Gemini to extract job listings from markdown content.
+    Use Gemini to extract job listings from markdown or HTML content.
 
     Args:
-        markdown: Page content as markdown
+        markdown: Page content as markdown (or HTML if marked with <!-- RAW_HTML -->)
         prompt: Custom extraction prompt (uses default if not provided)
         api_key: Google API key (uses GOOGLE_API_KEY env var if not provided)
 
@@ -343,12 +512,31 @@ def extract_jobs_from_markdown(
         logger.error("GOOGLE_API_KEY not set")
         return []
 
-    extraction_prompt = prompt or EXTRACTION_PROMPT
+    # Check if content is raw HTML (fallback mode)
+    is_html = markdown.startswith("<!-- RAW_HTML -->")
+    if is_html:
+        html_content = markdown[len("<!-- RAW_HTML -->\n"):]
+
+        # First try: Extract embedded JSON jobs directly (fast, no API call)
+        embedded_jobs = _extract_embedded_jobs(html_content)
+        if embedded_jobs:
+            logger.info(f"Extracted {len(embedded_jobs)} jobs from embedded JSON")
+            return embedded_jobs
+
+        # Fallback: Use Gemini to parse HTML
+        markdown = html_content
+        extraction_prompt = HTML_EXTRACTION_PROMPT
+        content_limit = 50000
+        logger.debug("Using HTML extraction mode with Gemini")
+    else:
+        extraction_prompt = prompt or EXTRACTION_PROMPT
+        content_limit = 25000
+
     start_time = time.time()
 
     try:
         payload = {
-            "contents": [{"parts": [{"text": f"{extraction_prompt}\n\nPage content:\n{markdown[:25000]}"}]}],
+            "contents": [{"parts": [{"text": f"{extraction_prompt}\n\nPage content:\n{markdown[:content_limit]}"}]}],
             "generationConfig": {
                 "temperature": 0.1,
                 "maxOutputTokens": 8192
